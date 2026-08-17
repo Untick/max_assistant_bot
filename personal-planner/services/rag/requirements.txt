@@ -1,0 +1,6 @@
+# RAG Service Dependencies
+faiss-cpu>=1.7.4
+sentence-transformers>=2.2.0
+sqlite-fts5>=1.0.0
+pydantic-settings>=2.1.0
+numpy>=1.24.0

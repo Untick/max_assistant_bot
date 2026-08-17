@@ -1,0 +1,6 @@
+# Agent Core Dependencies
+langchain>=0.1.0
+langgraph>=0.0.1
+httpx>=0.25.0
+pydantic-settings>=2.1.0
+cryptography>=41.0.0
