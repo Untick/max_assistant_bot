@@ -100,6 +100,34 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
 
+### Переключение ASR-провайдеров
+
+Система поддерживает два провайдера транскрибации голосовых сообщений:
+- **Whisper** (локально, по умолчанию)
+- **Yandex SpeechKit** (облачный API)
+
+Для выбора провайдера используйте переменную `ASR_PROVIDER` в файле `.env`:
+
+```ini
+# Использовать Whisper (по умолчанию)
+ASR_PROVIDER=whisper
+
+# ИЛИ использовать Yandex SpeechKit
+ASR_PROVIDER=yandex
+YANDEX_API_KEY=AQV...ваш_api_key_здесь
+YANDEX_FOLDER_ID=b1g...ваш_folder_id_здесь
+```
+
+**Получение credentials Yandex SpeechKit:**
+
+1. **API Key**: Создайте API-ключ в консоли Яндекс.Облака  
+   https://cloud.yandex.ru/docs/iam/concepts/authorization/api-key
+
+2. **Folder ID**: Узнайте ID каталога  
+   https://cloud.yandex.ru/docs/resource-manager/operations/folder/get-id
+
+**Отказоустойчивость**: При использовании Yandex SpeechKit и недоступности его API система автоматически переключается на Whisper с логированием события fallback.
+
 ### Шаг 3: Запуск сервисов
 
 ```bash

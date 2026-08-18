@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  # Инфраструктурные сервисы
+  postgres:
+    image: postgres:15-alpine
+    container_name: max_assistant_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-maxassistant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-maxassistant_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-maxassistant_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-maxassistant}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: max_assistant_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Микросервисы приложения
+  asr_service:
+    build:
+      context: .
+      dockerfile: services/asr/Dockerfile
+    container_name: max_assistant_asr
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    depends_on:
+      - redis
+
+  agent_core:
+    build:
+      context: .
+      dockerfile: services/agent/Dockerfile
+    container_name: max_assistant_agent
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    depends_on:
+      - rag_service
+      - mcp_server
+      - postgres
+      - redis
+
+  mcp_server:
+    build:
+      context: .
+      dockerfile: services/mcp/Dockerfile
+    container_name: max_assistant_mcp
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    depends_on:
+      - postgres
+      - redis
+
+  rag_service:
+    build:
+      context: .
+      dockerfile: services/rag/Dockerfile
+    container_name: max_assistant_rag
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    depends_on:
+      - postgres
+
+  tg_gateway:
+    build:
+      context: .
+      dockerfile: services/tg_gateway/Dockerfile
+    container_name: max_assistant_tg_gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    depends_on:
+      - asr_service
+      - agent_core
+      - mcp_server
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: services/scheduler/Dockerfile
+    container_name: max_assistant_scheduler
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - planner-network
+    depends_on:
+      - postgres
+      - redis
+
+networks:
+  planner-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

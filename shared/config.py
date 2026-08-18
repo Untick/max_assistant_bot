@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     ASR_MODEL_SIZE: str = "base"
     ASR_LANGUAGE: str = "ru"
     
+    # ASR Provider (whisper | yandex)
+    ASR_PROVIDER: str = "whisper"
+    
+    # Yandex SpeechKit
+    YANDEX_API_KEY: str = ""
+    YANDEX_FOLDER_ID: str = ""
+    
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/personal_planner"
     
