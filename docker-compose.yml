@@ -45,8 +45,8 @@ services:
   # Микросервисы приложения
   asr_service:
     build:
-      context: .
-      dockerfile: services/asr/Dockerfile
+      context: ./services/asr
+      dockerfile: Dockerfile
     container_name: max_assistant_asr
     restart: unless-stopped
     ports:
@@ -60,8 +60,8 @@ services:
 
   agent_core:
     build:
-      context: .
-      dockerfile: services/agent/Dockerfile
+      context: ./services/agent_core
+      dockerfile: Dockerfile
     container_name: max_assistant_agent
     restart: unless-stopped
     ports:
@@ -78,8 +78,8 @@ services:
 
   mcp_server:
     build:
-      context: .
-      dockerfile: services/mcp/Dockerfile
+      context: ./services/mcp_server
+      dockerfile: Dockerfile
     container_name: max_assistant_mcp
     restart: unless-stopped
     ports:
@@ -94,8 +94,8 @@ services:
 
   rag_service:
     build:
-      context: .
-      dockerfile: services/rag/Dockerfile
+      context: ./services/rag
+      dockerfile: Dockerfile
     container_name: max_assistant_rag
     restart: unless-stopped
     ports:
@@ -109,8 +109,8 @@ services:
 
   tg_gateway:
     build:
-      context: .
-      dockerfile: services/tg_gateway/Dockerfile
+      context: ./services/tg_gateway
+      dockerfile: Dockerfile
     container_name: max_assistant_tg_gateway
     restart: unless-stopped
     ports:
@@ -126,8 +126,8 @@ services:
 
   scheduler:
     build:
-      context: .
-      dockerfile: services/scheduler/Dockerfile
+      context: ./services/scheduler
+      dockerfile: Dockerfile
     container_name: max_assistant_scheduler
     restart: unless-stopped
     env_file:
